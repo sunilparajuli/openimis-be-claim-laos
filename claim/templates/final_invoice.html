@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style  type="text/css">
+          @page {
+                @frame body {
+                    -pdf-frame-content: waterMarkContent;
+                }
+                size: 'A4';
+                margin: 1cm;
+                @frame footer {
+                    -pdf-frame-content: footerContent;
+                    bottom: 0cm;
+                    margin-left: 9cm;
+                    margin-right: 9cm;
+                    height: 1cm;
+                }
+                
+            }
+            th{
+              text-align:left;
+            }
+            .alignleft,
+            .alignright {
+              display: inline-block;
+              background: red;
+            }
+            .alignleft {
+              padding-left: 100px;
+            }
+            .alignright {
+              padding-right: 100px;
+              text-align:right;
+            }
+        * {
+          {% comment %} box-sizing: border-box; {% endcomment %}
+          font-size: 9px;
+        }
+        .column {
+          float: left;
+          width: 50%;
+          padding: 10px;
+        }
+        .column1 {
+          float: left;
+          width: 33.33%;
+          {% comment %} padding: 10px; {% endcomment %}
+        }
+        .column2 {
+          float: left;
+          width: 70%;
+          {% comment %} padding: 10px; {% endcomment %}
+        }
+        .column3 {
+          float: left;
+          width: 30%;
+          {% comment %} padding: 10px; {% endcomment %}
+        }
+        .column4 {
+          float: left;
+          width: 40%;
+          {% comment %} padding: 10px; {% endcomment %}
+        }
+        .row{
+          width:100%
+        }
+        .row:after {
+          content: "";
+          display: table;
+          clear: both;
+        }
+
+        .content {
+          text-align: center;
+        }
+
+        .content1 {
+          text-align: center;
+          margin-bottom: -1em;
+          font-weight: bold;
+        }
+
+        .set {
+          margin-bottom: -1em;
+          text-align: left;
+        }
+
+        .tables {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        .tables tr{
+          border-bottom: 1px solid black;
+        }
+        .tables th{
+          text-align:left;
+        }
+        .tables td{
+          padding:5px 7px 5px 0px;
+        }
+        body {
+          {% comment %} height: 842px; {% endcomment %}
+          {% comment %} width: 595px; {% endcomment %}
+          /* to centre page on screen*/
+          {% comment %} margin-left: auto; {% endcomment %}
+          {% comment %} margin-right: auto; {% endcomment %}
+          {% comment %} border:1px black solid; {% endcomment %}
+          {% comment %} padding:20px; {% endcomment %}
+          background:url('http://localhost:8000/api/static/logo.png');
+          background-position: center;
+          background-repeat: no-repeat; 
+
+      }
+    </style>
+  </head>
+  <body>
+    <div class="row">
+      <center class="content1">
+        <img src="data:image/jpeg;base64,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"
+         alt="CBHI" style="height: 48px;width=300px" />
+    </div>
+    <table class="row" style="margin-top: 12px">
+      <tr>
+      <td>
+      <div class="alignleft">
+        <span class="set"><b>PAN</b>: {{claim.health_facility.acc_code}}</span
+        ><br />
+        <span class="set"><b>Invoice No.</b>: {{claim.invoice_no}}</span><br />
+        <span class="set"><b>Transaction Date</b>: {{claim.submit_stamp}}</span
+        ><br />
+        <span class="set"
+          ><b>Invoice Issue Date</b>: {{claim.payment_date}}</span
+        >
+      </div>
+      </td>
+      <td>
+      <div class="alignright">
+        <span class="set"><b>{{claim.health_facility.name|upper}}</b></span
+        ><br />
+        <span class="set"><b>{{claim.health_facility.address|title}}</b></span
+        ><br />
+        <span class="set">
+          <b>
+            {{claim.health_facility.phone|default_if_none:""}}
+            {{claim.health_facility.email}} {% if claim.health_facility.fax%}
+            Fax:{{claim.health_facility.fax}} {% endif %}
+          </b>
+        </span>
+      </div>
+      </td>
+      </tr>
+    </table>
+    <h3 class="content" style="text">Final Invoice</h3>
+    <table class="row">
+      <tr>
+      <td>
+      <table class="alignleft">
+        <tr class="set">
+          <th width=40 >Name</th>
+          <td>
+            : {{ claim.insuree.other_names|title}}
+            {{claim.insuree.last_name|title}}
+          </td>
+        </tr>
+        <tr class="set">
+          <th width=40>Address</th>
+          <td>:{{claim.insuree.current_address|slice:"1:-1"}}</td>
+        </tr>
+        {% if claim.refer_from_health_facility %}
+        <tr class="set">
+          <th width=40>Reffered by</th>
+          <td>: {{claim.refer_from_health_facility.name}}</td>
+        </tr>
+        {%endif%}
+        {% if claim.product %}
+        <tr class="set">
+          <th width=40>Scheme</th>
+          <td>: {{claim.product.name}}{% if claim.subProduct %}({{claim.subProduct.sch_name}}){%endif%}</td>
+        </tr>
+        {%endif%}
+        
+      </table>
+      </td>
+      <td>
+      <table class="alignright">
+        <tr class="set">
+          <th width=50>Age/Sex</th>
+          <td>: {{claim.insuree.age}} Y/{{claim.insuree.gender.gender}}</td>
+        </tr>
+        {% comment %} <tr class="set">
+          <th width=50>Email</th>
+          <td>: {{claim.insuree.email}}</td>
+        </tr> {% endcomment %}
+        {%if claim.employer %}
+        <tr class="set">
+          <th width=50>Organization</th>
+          <td>: {{claim.employer.EmployerNameEng|title}}</td>
+        </tr>
+        {%endif%}
+      </table>
+      </td>
+      <td>
+      <table class="alignright">
+        <tr class="set">
+          <th width=50>SSFID</th>
+          <td>: {{claim.insuree.chf_id}}</td>
+        </tr>
+        <tr class="set">
+          <th>Claim Code</th>
+          <td>: {{claim.code}}</td>
+        </tr>
+        <tr class="set">
+          <th>Status</th>
+          <td>: {% if claim.status == 2 %}
+                Saved
+                {% elif claim.status == 4 %}
+                Submitted
+                {% elif claim.status == 6 %}
+                Recommended
+                {% elif claim.status == 16 and claim.payment_status == 0 %}
+                In Process
+                {% elif claim.status == 16 and claim.payment_status == 1 %}
+                Rejected
+                {% elif claim.status == 16 and claim.payment_status == 2 %}
+                Paid
+                {% else %}
+                  Unknown
+                {%endif%}
+          </td>
+        </tr>
+        <tr class="set">
+          <th>Invoice Time</th>
+          <td>: {% now "SHORT_DATETIME_FORMAT" %}</td>
+        </tr>
+        {% if claim.refer_to_health_facility %}
+        <tr class="set">
+          <th width=45>Reffered to</th>
+          <td>: {{claim.refer_to_health_facility.name}}</td>
+        </tr>
+        {%endif%}
+      </table>
+      </td>
+      </tr>
+    </table>
+    <div class="row" style="margin-top: 12px">
+      {% if claim.items.all %}
+      <table class="tables">
+        <thead>
+          <tr>
+            <th></th>
+            <th></th>
+            <th colspan = 2 style="border:1px solid black"><center>Claimed</center></th>
+            <th colspan = 3 style="border:1px solid black"><center>Approved</center</th>
+          </tr>
+          <tr style="margin-top:5px;padding-top:5px">
+            <th width=25>SN.</th>
+            <th width=150>Item Name</th>
+            <th width=80>Quantity</th>
+            <th width=80>Rate</th>          
+            <th width=80>Quantity</th>
+            <th width=80>Rate</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in claim.items.all %}
+          <tr>
+            <td class="tableNumber">{{forloop.counter}}</td>
+            <td>{{item.item.name}}</td>
+            <td class="tableNumber">{{item.qty_provided}}</td>
+            <td class="tableNumber">{{item.price_asked}}</td>
+            <td class="tableNumber">
+              {%if item.rejection_reason == 0%}
+                {% if item.qty_approved %}
+                {{item.qty_approved}}
+                {%else %}
+                {{item.qty_provided}}
+                {%endif%}
+              {%else%}
+                Rejected
+              {%endif%}
+            </td>
+            <td class="tableNumber">
+              {%if item.rejection_reason == 0%}
+                {% if item.price_adjusted %}
+                {{item.price_adjusted}}
+                {%elif item.price_valuated %}
+                {{item.price_valuated}}
+                {%elif item.price_approved%}
+                {{item.price_approved}}
+                {%else%}
+                  {{item.price_asked}}
+                {%endif%}
+              {%else%}
+                Rejected
+              {%endif%}
+            </td>
+            <td class="tableNumber">
+              {%if item.rejection_reason == 0%}
+                {%if item.price_approved and item.qty_approved%}
+                  {% widthratio item.price_approved 1 item.qty_approved %}
+                {%elif item.price_approved and not item.qty_approved%}
+                  {% widthratio item.price_approved 1 item.qty_provided %}
+                {%elif not item.price_approved and item.qty_approved%}
+                  {% widthratio item.price_asked 1 item.qty_approved %}
+                {%else%}
+                  {% widthratio item.price_asked 1 item.qty_provided %}
+                {%endif%}
+              {%else%}
+                  Rejected
+              {%endif%}
+            </td>
+          </tr
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif%}
+      {% if claim.services.all %}
+      <table class="tables" style="margin-top:10px;">
+        <thead>
+         <tr>
+            <th></th>
+            <th></th>
+            <th colspan = 2 style="border:1px solid black"><center>Claimed</center></th>
+            <th colspan = 3 style="border:1px solid black"><center>Approved</center</th>
+          </tr>
+          <tr style="margin-top:5px;padding-top:5px">
+          <th width=25>SN.</th>
+          <th width=150>Service Name</th>
+          <th width=80>Quantity</th>
+          <th width=80>Rate</th>          
+          <th width=80>Quantity</th>
+          <th width=80>Rate</th>
+          <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in claim.services.all %}
+          <tr>
+            <td class="tableNumber">{{forloop.counter}}</td>
+            <td>{{item.service.name}}</td>
+            <td class="tableNumber">{{item.qty_provided}}</td>
+            <td class="tableNumber">{{item.price_asked}}</td>
+            <td class="tableNumber">
+              {%if item.rejection_reason == 0%}
+                {% if item.qty_approved %}
+                {{item.qty_approved}}
+                {%else %}
+                {{item.qty_provided}}
+                {%endif%}
+              {%else%}
+                Rejected
+              {%endif%}
+            </td>
+            <td class="tableNumber">
+              {%if item.rejection_reason == 0%}
+                {% if item.price_adjusted %}
+                  {{item.price_adjusted}}
+                  {%elif item.price_valuated %}
+                  {{item.price_valuated}}
+                  {%elif item.price_approved%}
+                  {{item.price_approved}}
+                {%else%}
+                  {{item.price_asked}}
+                {%endif%}
+              {%else%}
+                Rejected
+              {%endif%}
+            </td>
+            <td class="tableNumber">
+              {%if item.rejection_reason == 0%}
+                {%if item.price_approved and item.qty_approved%}
+                  {% widthratio item.price_approved 1 item.qty_approved %}
+                {%elif item.price_approved and not item.qty_approved%}
+                  {% widthratio item.price_approved 1 item.qty_provided %}
+                {%elif not item.price_approved and item.qty_approved%}
+                  {% widthratio item.price_asked 1 item.qty_approved %}
+                {%else%}
+                  {% widthratio item.price_asked 1 item.qty_provided %}
+                {%endif%}
+              {%else%}
+                Rejected
+              {%endif%}
+
+            </td>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif%}
+      <table style="margin-top:5px">
+        <tr>
+          <th width=495 style="text-align:left">Total Claimed</th>
+          <td>{{claim.claimed}}</td>
+        </tr>
+        {% if claim.product_id == 2 %}
+        <tr>
+          <td>
+            <b >Contributor Liability 20%</b>
+          </td>
+          <td>
+            ({{contributor_liability}})
+          </td>
+        </tr>
+        {%endif%}
+        <tr >
+          <td><b>UnApproved Amount</b></td> 
+          <td> ({{unapproveAmount}})</td>
+        </tr>
+        <tr style="border-top:1px black solid;padding-top:5px;">
+          <td>
+            <b >SSF Paid</b>
+          </td>
+          <td> 
+            {{claim.approved}}
+          </td>
+        </tr>
+
+      </table>
+    </div>
+    {% comment %} <div class="row">
+      <table width="35%">
+      <tr>
+        <td><b class="set">Total Claimed </b></td><td> {{claim.claimed}}</td><br/>
+      </tr>
+      <tr>
+        <td>
+          <b class="set">Contributor Liability 20%</b>
+        </td>
+        <td>
+          ({{contributor_liability}})
+        </td>
+      </tr>
+      <tr >
+        <td><b class="set">UnApproved Amount</b></td> 
+        <td> ({{unapproveAmount}})</td><br/>
+      </tr>
+      <tr style="border-top:1px black solid;padding-top:5px;">
+        <td>
+          <b class="set">SSF Paid</b>
+        </td>
+        <td> 
+          {{claim.approved}}
+        </td>
+      </tr>
+      </table>
+    </div> {% endcomment %}
+
+    <table class="tables">
+      <tr><th>Inwords: Rs. {{total_inword|upper}} ONLY</th></tr>.
+    </table>
+    <h4 class="set">
+      Kindly bring all previous reports and documents on the day of the
+      appointment or treatment
+    </h4>
+    <h4 class="set">Remarks:</h4>
+
+    <div class="row">
+      <div class="column3" style="float:right">
+        <h4>For: {{claim.health_facility.name|upper}}</h4>
+      </div>
+    </div>
+  </body>
+</html>

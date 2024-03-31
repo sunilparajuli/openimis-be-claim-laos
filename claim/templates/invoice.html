@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style  type="text/css">
+          @page {
+                @frame body {
+                    -pdf-frame-content: waterMarkContent;
+                }
+                size: 'A4';
+                margin: 1cm;
+                @frame footer {
+                    -pdf-frame-content: footerContent;
+                    bottom: 0cm;
+                    margin-left: 9cm;
+                    margin-right: 9cm;
+                    height: 1cm;
+                }
+                
+            }
+            th{
+              text-align:left;
+            }
+            .alignleft,
+            .alignright {
+              display: inline-block;
+              background: rgb(255, 255, 255);
+            }
+            .alignleft {
+              padding-left: 100px;
+            }
+            .alignright {
+              padding-right: 100px;
+              text-align:right;
+            }
+        * {
+          {% comment %} box-sizing: border-box; {% endcomment %}
+          font-size: 9px;
+        }
+        .column {
+          float: left;
+          width: 50%;
+          padding: 10px;
+        }
+        .column1 {
+          float: left;
+          width: 33.33%;
+          {% comment %} padding: 10px; {% endcomment %}
+        }
+        .column2 {
+          float: left;
+          width: 70%;
+          {% comment %} padding: 10px; {% endcomment %}
+        }
+        .column3 {
+          float: left;
+          width: 30%;
+          {% comment %} padding: 10px; {% endcomment %}
+        }
+        .column4 {
+          float: left;
+          width: 40%;
+          {% comment %} padding: 10px; {% endcomment %}
+        }
+        .row{
+          width:100%
+        }
+        .row:after {
+          content: "";
+          display: table;
+          clear: both;
+        }
+
+        .content {
+          text-align: center;
+        }
+
+        .content1 {
+          text-align: center;
+          margin-bottom: -1em;
+          font-weight: bold;
+        }
+
+        .set {
+          margin-bottom: -1em;
+          text-align: left;
+        }
+
+        .tables {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        .tables tr{
+          border-bottom: 1px solid black;
+        }
+        .tables th{
+          text-align:left;
+          background-color: rgb(226, 220, 220);
+        }
+        .tables td{
+          padding:5px 7px 5px 0px;
+        }
+        body {
+          {% comment %} height: 842px; {% endcomment %}
+          {% comment %} width: 595px; {% endcomment %}
+          /* to centre page on screen*/
+          {% comment %} margin-left: auto; {% endcomment %}
+          {% comment %} margin-right: auto; {% endcomment %}
+          {% comment %} border:1px black solid; {% endcomment %}
+          {% comment %} padding:20px; {% endcomment %}
+          background:url('http://localhost:8000/api/static/logo.png');
+          background-position: center;
+          background-repeat: no-repeat; 
+
+      }
+    </style>
+  </head>
+  <body>
+    <div class="row">
+      <center class="content1">
+        <img src="http://localhost:8000/api/static/logo.png" alt="Social
+        Security Fund" style="height: 48px;width=300px" />
+    </div>
+    <table class="row" style="margin-top: 12px">
+      <tr>
+      <td>
+      <div class="alignleft">
+        <span class="set"><b>PAN</b>: {{claim.health_facility.acc_code}}</span
+        ><br />
+        <span class="set"><b>Invoice No.</b>: {{claim.invoice_no}}</span><br />
+        <span class="set"><b>Transaction Date</b>: {{claim.submit_stamp}}</span
+        ><br />
+        <span class="set"
+          ><b>Invoice Issue Date</b>: {{claim.submit_stamp}}</span
+        >
+      </div>
+      </td>
+      <td>
+      <div class="alignright">
+        <span class="set"><b>{{claim.health_facility.name|upper}}</b></span
+        ><br />
+        <span class="set"><b>{{claim.health_facility.address|title}}</b></span
+        ><br />
+        <span class="set">
+          <b>
+            {{claim.health_facility.phone|default_if_none:""}}
+            {{claim.health_facility.email}} {% if claim.health_facility.fax%}
+            Fax:{{claim.health_facility.fax}} {% endif %}
+          </b>
+        </span>
+      </div>
+      </td>
+      </tr>
+    </table>
+    <h3 class="content" style="text">Invoice</h3>
+    <table class="row">
+      <tr>
+      <td>
+      <table class="alignleft">
+        <tr class="set">
+          <th width=40 >Name</th>
+          <td>
+            : {{ claim.insuree.other_names|title}}
+            {{claim.insuree.last_name|title}}
+          </td>
+        </tr>
+        <tr class="set">
+          <th width=40>Address</th>
+          <td>:{{claim.insuree.current_address|slice:"1:-1"}}</td>
+        </tr>
+        {% if claim.refer_from_health_facility %}
+        <tr class="set">
+          <th width=40>Reffered by</th>
+          <td>: {{claim.refer_from_health_facility.name}}</td>
+        </tr>
+        {%endif%}
+        {% if claim.product %}
+        <tr class="set">
+          <th width=40>Scheme</th>
+          <td>: {{claim.product.name}}{% if claim.subProduct %}({{claim.subProduct.sch_name}}){%endif%}</td>
+        </tr>
+        {%endif%}
+        
+      </table>
+      </td>
+      <td>
+      <table class="alignright">
+        <tr class="set">
+          <th width=50>Age/Sex</th>
+          <td>: {{claim.insuree.age}} Y/{{claim.insuree.gender.gender}}</td>
+        </tr>
+        {% comment %} <tr class="set">
+          <th width=50>Email</th>
+          <td>: {{claim.insuree.email}}</td>
+        </tr> {% endcomment %}
+        {%if claim.employer %}
+        <tr class="set">
+          <th width=50>Organization</th>
+          <td>: {{claim.employer.EmployerNameEng|title}}</td>
+        </tr>
+        {%endif%}
+      </table>
+      </td>
+      <td>
+      <table class="alignright">
+        <tr class="set">
+          <th width=50>Insurance Number</th>
+          <td>: {{claim.insuree.chf_id}}</td>
+        </tr>
+        <tr class="set">
+          <th>Claim Code</th>
+          <td>: {{claim.code}}</td>
+        </tr>
+        <tr class="set">
+          <th>Status</th>
+          <td>: {% if claim.status == 2 %}
+                Saved
+                {% elif claim.status == 4 %}
+                Submitted
+                {% elif claim.status == 6 %}
+                Recommended
+                {% elif claim.status == 16 and claim.payment_status == 0 %}
+                In Process
+                {% elif claim.status == 16 and claim.payment_status == 1 %}
+                Rejected
+                {% elif claim.status == 16 and claim.payment_status == 2 %}
+                Paid
+                {% else %}
+                  Unknown
+                {%endif%}
+          </td>
+        </tr>
+        <tr class="set">
+          <th>Invoice Time</th>
+          <td>: {% now "SHORT_DATETIME_FORMAT" %}</td>
+        </tr>
+        {% if claim.refer_to_health_facility %}
+        <tr class="set">
+          <th width=45>Reffered to</th>
+          <td>: {{claim.refer_to_health_facility.name}}</td>
+        </tr>
+        {%endif%}
+      </table>
+      </td>
+      </tr>
+    </table>
+    <div class="row" style="margin-top: 12px">
+      {% if claim.items.all %}
+      <table class="tables">
+        <thead>
+          <th width=25>SN.</th>
+          <th width=250>Item Name</th>         
+          <th width=100>Quantity</th>
+
+          <th width=80>Rate</th>
+          <th>Amount</th>
+        </thead>
+        <tbody>
+          {% for item in claim.items.all %}
+          <tr>
+            <td class="tableNumber">{{forloop.counter}}</td>
+            <td>{{item.item.name}}</td>
+            <td class="tableNumber">{{item.qty_provided}}</td>
+            <td class="tableNumber">{{item.price_asked}}</td>
+            <td class="tableNumber">{% widthratio item.price_asked 1 item.qty_provided %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif%}
+      {% if claim.services.all %}
+      <table class="tables" style="margin-top:10px;">
+        <thead>
+          <th width=25>SN.</th>
+          <th width=250>Service Name</th>
+          <th width=100>Quantity</th>
+          <th width=80>Rate</th>
+          <th>Amount</th>
+        </thead>
+        <tbody>
+          {% for item in claim.services.all %}
+          <tr>
+            <td class="tableNumber">{{forloop.counter}}</td>
+            <td>{{item.service.name}}</td>
+            <td class="tableNumber">{{item.qty_provided}}</td>
+            <td class="tableNumber">{{item.price_asked}}</td>
+            <td class="tableNumber">{% widthratio item.price_asked 1 item.qty_provided %}</td>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif%}
+      <table>
+        <tr>
+          <th width=450 style="text-align:left">Total</th>
+          <td>{{claim.claimed}}</td>
+        </tr>
+
+      </table>
+    </div>
+    <div class="row">
+      <div class="column2">
+        <h4 class="set">CUSTOMER COPY</h4>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="column1" style="float:right;text-align:right">
+        {% comment %} <b class="set">SSF Liability 80% Due : {{ssf_liability}}</b><br> {% endcomment %}
+        {% if claim.product_id == 2%}
+        <b class="set">SSF Liability 80% Due</b><br>
+        <b class="set">Contributor Liability 20% : {{contributor_liability}}</b>
+        {%else%}
+        <b class="set">Hospital Liability : {{claim.claimed}}</b>
+        {%endif%}
+      </div>
+    </div>
+
+    <table class="tables">
+      <tr><th>Inwords: Rs. {{total_inword|upper}} ONLY</th></tr>.
+    </table>
+    <h4 class="set">
+      Kindly bring all previous reports and documents on the day of the
+      appointment or treatment
+    </h4>
+    <h4 class="set">Remarks: {{claim.payment_remarks}}</h4>
+
+    <div class="row">
+      <div class="column3" style="float:right">
+        <h4>For: {{claim.health_facility.name|upper}}</h4>
+      </div>
+    </div>
+  </body>
+</html>

@@ -237,7 +237,9 @@ class ClaimInputType(OpenIMISMutation.Input):
     feedback_status = TinyInt(required=False)
     feedback = graphene.Field(FeedbackInputType, required=False)
     care_type = graphene.String(required=False)
-
+    discharge_reason = graphene.String(required=False)
+    service_area = graphene.String(required=False)
+    service_type = graphene.String(required=False)
     items = graphene.List(ClaimItemInputType, required=False)
     services = graphene.List(ClaimServiceInputType, required=False)
 
@@ -301,6 +303,7 @@ def validate_claim_data(data, user):
 
 @transaction.atomic
 def update_or_create_claim(data, user):
+    # print("data", data)
     if "client_mutation_id" in data:
         data.pop('client_mutation_id')
     if "client_mutation_label" in data:
