@@ -190,3 +190,42 @@ class ClaimServiceGQLType(DjangoObjectType):
 
     class Meta:
         model = ClaimService
+
+class HospitalTotalClaim(graphene.ObjectType):
+    hospital_name = graphene.String()
+    total_claim = graphene.Int()
+
+class TopClaimType(graphene.ObjectType):
+    claim_id = graphene.ID()
+    claimed_amount = graphene.Float()
+    hospital_name = graphene.String()
+
+
+class RegisteredContributorsGQLType(graphene.ObjectType):
+    male_count = graphene.Int()
+    female_count = graphene.Int()    
+
+class DashboardGQLType(graphene.ObjectType):
+    # contains summary for dashboard graphs 
+    top_claims = graphene.List(TopClaimType)
+    total_claims_by_hospital = graphene.List(HospitalTotalClaim)
+    registered_contributors = graphene.Field(RegisteredContributorsGQLType)
+    Medical_in_progress = graphene.Int()
+    Medical_settled = graphene.Int()
+    Medical_claim_application = graphene.Int()
+    Medical_rejected = graphene.Int()
+    Medical_forwarded = graphene.Int()
+    Medical_entered = graphene.Int()
+
+    # Data set 2
+    work_place_accident = graphene.Int()
+    accident = graphene.Int()
+    occupational_disease = graphene.Int()
+    other = graphene.Int()
+
+    #Data set 3
+    range1 = graphene.Int() #1-100000
+    range2 = graphene.Int() #100001-200000
+    range3 = graphene.Int() #200001-300000
+    range4 = graphene.Int() #300001-400000
+    range5 = graphene.Int() #above 400000

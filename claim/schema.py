@@ -23,6 +23,11 @@ from .gql_queries import *  # lgtm [py/polluting-import]
 from .gql_mutations import *  # lgtm [py/polluting-import]
 
 
+class HospitalClaimDataType(graphene.ObjectType):
+    hospital = graphene.String()
+    acceptedClaims = graphene.Int()
+    rejectedClaims = graphene.Int()
+
 class Query(graphene.ObjectType):
     claims = OrderedDjangoFilterConnectionField(
         ClaimGQLType,
@@ -36,6 +41,109 @@ class Query(graphene.ObjectType):
         care_type=graphene.String(required=False),
         show_restored=graphene.Boolean(required=False)
         )
+    health_facilities = graphene.List(HospitalClaimDataType)
+    hospital_claim_data = graphene.List(graphene.List(graphene.String))
+    registered_contributors = graphene.Field(RegisteredContributorsGQLType)
+
+
+    def resolve_registered_contributors(root, info):
+        # Count male contributors
+        male_count = Insuree.objects.filter(gender__icontains='M', validity_to=None).count()
+        
+        # Count female contributors
+        female_count = Insuree.objects.filter(gender__icontains='F', validity_to=None).count()
+
+        # Return the counts
+        return RegisteredContributorsGQLType(
+            male_count=male_count,
+            female_count=female_count
+        )    
+
+    def resolve_health_facilities(self, info):
+        return HealthFacility.objects.all()
+    def resolve_hospital_claim_data(self, info):
+        data = [['Hospital', 'Accepted Claims', 'Rejected Claims']]
+        claims = Claim.objects.filter(status__in=[2, 1])
+
+        for claim in claims:
+            hospital_name = claim.health_facility.name
+            accepted = claim.status > 1
+            rejected = claim.status == 1
+
+            if accepted:
+                data.append([hospital_name, claim.claimed, 0])
+            elif rejected:
+                data.append([hospital_name, 0, claim.claimed])
+
+        return data
+    dashboard = graphene.Field(DashboardGQLType)
+    from django.db.models import Count, Q
+
+    def resolve_dashboard(root, info):
+        # Fetching all counts in a single query
+        total_claims_by_hospital = (
+            Claim.objects
+            .values('health_facility__name')
+            .annotate(total_claim=Count('id'))
+        )
+
+        # Constructing list of HospitalTotalClaim objects
+        total_claims_data = [
+            HospitalTotalClaim(
+                hospital_name=entry['health_facility__name'],
+                total_claim=entry['total_claim']
+            )
+            for entry in total_claims_by_hospital
+        ]        
+        top_claims = (
+            Claim.objects
+            .select_related('health_facility')
+            .filter(validity_to__isnull=True)
+            .order_by('-claimed')[:10]
+        )
+        top_claims_data = [
+            {
+                'claim_id': claim.id,
+                'claimed_amount': claim.claimed,
+                'hospital_name': claim.health_facility.name if claim.health_facility else None
+            }
+            for claim in top_claims
+        ]
+        claim_counts = (
+            Claim.objects
+            .filter(validity_to__isnull=True)
+            .aggregate(
+                medical_claim_application=Count('pk'),
+                medical_forwarded=Count('pk', filter=Q(status=9)),
+                medical_valuated=Count('pk', filter=Q(status=16)),
+                medical_reject=Count('pk', filter=Q(status=1)),
+                medical_enter=Count('pk', filter=Q(status=2)),
+                medical_checked=Count('pk', filter=Q(status=6)),
+                range1=Count('pk', filter=Q(approved__gte=1, approved__lte=100000)),
+                range2=Count('pk', filter=Q(approved__gte=100001, approved__lte=200000)),
+                range3=Count('pk', filter=Q(approved__gte=200001, approved__lte=300000)),
+                range4=Count('pk', filter=Q(approved__gte=300001, approved__lte=400000)),
+                range5=Count('pk', filter=Q(approved__gte=400001))
+            )
+        )
+
+        # Constructing DashboardGQLType instance with fetched counts
+        return DashboardGQLType(
+            top_claims=top_claims_data,
+            total_claims_by_hospital=total_claims_data,
+            Medical_in_progress=claim_counts['medical_checked'],
+            Medical_settled=claim_counts['medical_valuated'],
+            Medical_claim_application=claim_counts['medical_claim_application'],
+            Medical_rejected=claim_counts['medical_reject'],
+            Medical_forwarded=claim_counts['medical_forwarded'],
+            Medical_entered=claim_counts['medical_enter'],
+            range1=claim_counts['range1'],
+            range2=claim_counts['range2'],
+            range3=claim_counts['range3'],
+            range4=claim_counts['range4'],
+            range5=claim_counts['range5'],
+        )
+
 
     claim = graphene.Field(
         ClaimGQLType, 
@@ -287,6 +395,7 @@ class Mutation(graphene.ObjectType):
     skip_claims_review = SkipClaimsReviewMutation.Field()
     process_claims = ProcessClaimsMutation.Field()
     delete_claims = DeleteClaimsMutation.Field()
+
 
 
 def on_claim_mutation(sender, **kwargs):
